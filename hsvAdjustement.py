@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import time
 from gif.detect_intensity import getVar
 
 def nothing(x):
@@ -60,16 +61,27 @@ while True:
     mask = cv2.inRange(hsv, lower_range, upper_range)
     mask_3 = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
     
-    contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    l = []
+    rows, cols = np.where(mask==255)
+    for row, col in zip(rows,cols):
+        l.append(image[row][col])
+    l = np.array(l)
+    mean = np.mean(l)
+    print(mean, len(l))
+
+    
+    #contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    #
+    #
+    #for contour in contours:
+    #    x, y, w, h = cv2.boundingRect(contour)
+    #    if w >= 15 and h >= 15:
+    #        cropped = image[y:y+h, x:x+w]
+    #        cv2.rectangle(i, (x, y), (x + w, y + h), (0, 255, 0), 1)
+    #        cv2.putText(i, f"{str(round(np.mean(cropped), 2))} {y,h,x,w}", (x,y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 1)
+    #
+    
     i = image.copy()
-    
-    for contour in contours:
-        x, y, w, h = cv2.boundingRect(contour)
-        if w >= 100 and h >= 100:
-            cropped = image[y:y+h, x:x+w]
-            cv2.rectangle(i, (x, y), (x + w, y + h), (0, 255, 0), 1)
-            cv2.putText(i, f"{str(round(np.mean(cropped), 2))} {y,h,x,w}", (x,y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 1)
-    
     res = cv2.bitwise_and(image, image, mask=mask)
     stacked = np.hstack((mask_3, i, res))
     key = cv2.waitKey(1)
