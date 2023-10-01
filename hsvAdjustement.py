@@ -68,7 +68,7 @@ while True:
     l = np.array(l)
     mean = np.mean(l)
     print(mean, len(l))
-
+    time.sleep(500)
     
     #contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     #
