@@ -28,6 +28,7 @@ cv2.createTrackbar("U - V", "Trackbars", 255, 255, nothing)
 
 # Load the image
 img_path = getVar(1, 'Image', r"C:\Users\shashg\Documents\AI_Data\1.5 mM h2o2\128_cropped.jpg")
+rects = input("Are rectangles required? ")
 image = cv2.imread(img_path)
 
 key_actions = {
@@ -61,27 +62,23 @@ while True:
     mask = cv2.inRange(hsv, lower_range, upper_range)
     mask_3 = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
     
-    l = []
-    rows, cols = np.where(mask==255)
-    for row, col in zip(rows,cols):
-        l.append(image[row][col])
-    l = np.array(l)
-    mean = np.mean(l)
-    print(mean, len(l))
-    time.sleep(0.5)
-    
-    #contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    #
-    #
-    #for contour in contours:
-    #    x, y, w, h = cv2.boundingRect(contour)
-    #    if w >= 15 and h >= 15:
-    #        cropped = image[y:y+h, x:x+w]
-    #        cv2.rectangle(i, (x, y), (x + w, y + h), (0, 255, 0), 1)
-    #        cv2.putText(i, f"{str(round(np.mean(cropped), 2))} {y,h,x,w}", (x,y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 1)
-    #
-    
     i = image.copy()
+
+    if len(rects)>2:
+        contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)     
+        for contour in contours:
+            x, y, w, h = cv2.boundingRect(contour)
+            cv2.rectangle(i, (x, y), (x + w, y + h), (0, 255, 0), 1)
+    else:
+        l = []
+        rows, cols = np.where(mask==255)
+        for row, col in zip(rows,cols):
+            l.append(image[row][col])
+        l = np.array(l)
+        mean = np.mean(l)
+        print(mean, len(l))
+        time.sleep(0.5)             
+
     res = cv2.bitwise_and(image, image, mask=mask)
     stacked = np.hstack((mask_3, i, res))
     key = cv2.waitKey(1)
